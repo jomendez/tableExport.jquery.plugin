@@ -32,7 +32,8 @@ THE SOFTWARE.*/
 						pdfLeftMargin:20,
 						escape:'true',
 						htmlContent:'false',
-						consoleLog:'false'
+						consoleLog: 'false',
+                        fileName: 'report'
 				};
                 
 				var options = $.extend(defaults, options);
@@ -75,7 +76,14 @@ THE SOFTWARE.*/
 						console.log(tdData);
 					}
 					var base64data = "base64," + $.base64.encode(tdData);
-					window.open('data:application/'+defaults.type+';filename=exportData;' + base64data);
+				    //window.open('data:application/'+defaults.type+';filename=exportData;' + base64data);
+
+                    //Jose added this lines
+				    // Blob for saving.
+					var blob = new Blob([tdData], { type: "application/" + defaults.type });
+				    // Tell the browser to save as report.txt.
+					saveAs(blob, defaults.fileName + '.' + defaults.type);
+
 				}else if(defaults.type == 'sql'){
 				
 					// Header
@@ -276,7 +284,13 @@ THE SOFTWARE.*/
 					excelFile += "</html>";
 
 					var base64data = "base64," + $.base64.encode(excelFile);
-					window.open('data:application/vnd.ms-'+defaults.type+';filename=exportData.doc;' + base64data);
+				    //window.open('data:application/vnd.ms-'+defaults.type+';filename=exportData.doc;' + base64data);
+					
+				    //Jose added this lines
+				    // Blob for saving.
+					var blob = new Blob([excelFile], { type: "application/" + defaults.type });
+				    // Tell the browser to save as report.txt.
+					saveAs(blob, defaults.fileName + '.' + defaults.type);
 					
 				}else if(defaults.type == 'png'){
 					html2canvas($(el), {
@@ -331,8 +345,10 @@ THE SOFTWARE.*/
 					});					
 										
 					// Output as Data URI
-					doc.output('datauri');
-	
+				    //doc.output('datauri');
+					var fileName = defaults.fileName + '.' + defaults.type;
+					doc.output('downloable', fileName);
+					
 				}
 				
 				

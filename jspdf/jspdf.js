@@ -1,3 +1,4 @@
+
 /**
  * jsPDF
  * (c) 2009 James Hall
@@ -285,13 +286,19 @@ var jsPDF = function(){
 		addImage: function(imageData, format, x, y, w, h) {
 		
 		},
-		output: function(type, options) {
+		output: function(type, fileName) {
 			endDocument();
 			if(type == undefined) {
 				return buffer;
 			}
 			if(type == 'datauri') {
 				document.location.href = 'data:application/pdf;base64,' + Base64.encode(buffer);
+			} else if (type == 'downloable') {
+			    //Jose added this lines
+			    // Blob for saving.
+			    var blob = new Blob([buffer], { type: "application/pdf" });
+			    // Tell the browser to save as report.txt.
+			    saveAs(blob, fileName);
 			}
 			// @TODO: Add different output options
 		},
