@@ -46,3 +46,4 @@ pdfLeftMargin:20<BR>
 escape:'true'<BR>
 htmlContent:'false'<BR>
 consoleLog:'false' <BR>
+filename:'report' <BR>

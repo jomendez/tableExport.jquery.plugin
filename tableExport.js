@@ -44,8 +44,9 @@ THE SOFTWARE.*/
 					// Header
 					var tdData ="";
 					$(el).find('thead').find('tr').each(function() {
-					tdData += "\n";					
-						$(this).filter(':visible').find('th').each(function(index,data) {
+					tdData += "\n";
+                        //removed the :visible filter to allow tables from objects in memory
+						$(this).find('th').each(function(index,data) {
 							if ($(this).css('display') != 'none'){
 								if(defaults.ignoreColumn.indexOf(index) == -1){
 									tdData += '"' + parseString($(this)) + '"' + defaults.separator;									
@@ -60,7 +61,7 @@ THE SOFTWARE.*/
 					// Row vs Column
 					$(el).find('tbody').find('tr').each(function() {
 					tdData += "\n";
-						$(this).filter(':visible').find('td').each(function(index,data) {
+						$(this).find('td').each(function(index,data) {
 							if ($(this).css('display') != 'none'){
 								if(defaults.ignoreColumn.indexOf(index) == -1){
 									tdData += '"'+ parseString($(this)) + '"'+ defaults.separator;
@@ -78,10 +79,9 @@ THE SOFTWARE.*/
 					var base64data = "base64," + $.base64.encode(tdData);
 				    //window.open('data:application/'+defaults.type+';filename=exportData;' + base64data);
 
-                    //Jose added this lines
 				    // Blob for saving.
 					var blob = new Blob([tdData], { type: "application/" + defaults.type });
-				    // Tell the browser to save as report.txt.
+				    // Tell the browser to save it with fileName and extension e.g. report.txt.
 					saveAs(blob, defaults.fileName + '.' + defaults.type);
 
 				}else if(defaults.type == 'sql'){
@@ -90,7 +90,7 @@ THE SOFTWARE.*/
 					var tdData ="INSERT INTO `"+defaults.tableName+"` (";
 					$(el).find('thead').find('tr').each(function() {
 					
-						$(this).filter(':visible').find('th').each(function(index,data) {
+						$(this).find('th').each(function(index,data) {
 							if ($(this).css('display') != 'none'){
 								if(defaults.ignoreColumn.indexOf(index) == -1){
 									tdData += '`' + parseString($(this)) + '`,' ;									
@@ -105,7 +105,7 @@ THE SOFTWARE.*/
 					// Row vs Column
 					$(el).find('tbody').find('tr').each(function() {
 					tdData += "(";
-						$(this).filter(':visible').find('td').each(function(index,data) {
+						$(this).find('td').each(function(index,data) {
 							if ($(this).css('display') != 'none'){
 								if(defaults.ignoreColumn.indexOf(index) == -1){
 									tdData += '"'+ parseString($(this)) + '",';
@@ -126,9 +126,12 @@ THE SOFTWARE.*/
 						console.log(tdData);
 					}
 					
-					var base64data = "base64," + $.base64.encode(tdData);
-					window.open('data:application/sql;filename=exportData;' + base64data);
-					
+					//var base64data = "base64," + $.base64.encode(tdData);
+					//window.open('data:application/sql;filename=exportData;' + base64data);
+					    // Blob for saving.
+                        var blob = new Blob([tdData], { type: "application/" +defaults.type});
+                        // Tell the browser to save it with fileName and extension e.g. report.txt.
+                        saveAs(blob, defaults.fileName + '.' +defaults.type);
 				
 				}else if(defaults.type == 'json'){
 				
@@ -137,7 +140,7 @@ THE SOFTWARE.*/
 						var tdData ="";	
 						var jsonArrayTd = [];
 					
-						$(this).filter(':visible').find('th').each(function(index,data) {
+						$(this).find('th').each(function(index,data) {
 							if ($(this).css('display') != 'none'){
 								if(defaults.ignoreColumn.indexOf(index) == -1){
 									jsonArrayTd.push(parseString($(this)));									
@@ -153,7 +156,7 @@ THE SOFTWARE.*/
 						var tdData ="";	
 						var jsonArrayTd = [];
 					
-						$(this).filter(':visible').find('td').each(function(index,data) {
+						$(this).find('td').each(function(index,data) {
 							if ($(this).css('display') != 'none'){
 								if(defaults.ignoreColumn.indexOf(index) == -1){
 									jsonArrayTd.push(parseString($(this)));									
@@ -175,8 +178,15 @@ THE SOFTWARE.*/
 					if(defaults.consoleLog == 'true'){
 						console.log(JSON.stringify(jsonExportArray));
 					}
-					var base64data = "base64," + $.base64.encode(JSON.stringify(jsonExportArray));
-					window.open('data:application/json;filename=exportData;' + base64data);
+					//var base64data = "base64," + $.base64.encode(JSON.stringify(jsonExportArray));
+					//window.open('data:application/json;filename=exportData;' + base64data);
+					    // Blob for saving.
+					var blob = new Blob([jsonExportArray], {
+                            type: "application/" +defaults.type });
+					        // Tell the browser to save it with fileName and extension e.g. report.txt.
+					saveAs(blob, defaults.fileName + '.' +defaults.type);
+
+
 				}else if(defaults.type == 'xml'){
 				
 					var xml = '<?xml version="1.0" encoding="utf-8"?>';
@@ -184,7 +194,7 @@ THE SOFTWARE.*/
 
 					// Header
 					$(el).find('thead').find('tr').each(function() {
-						$(this).filter(':visible').find('th').each(function(index,data) {
+						$(this).find('th').each(function(index,data) {
 							if ($(this).css('display') != 'none'){					
 								if(defaults.ignoreColumn.indexOf(index) == -1){
 									xml += "<field>" + parseString($(this)) + "</field>";
@@ -199,7 +209,7 @@ THE SOFTWARE.*/
 					$(el).find('tbody').find('tr').each(function() {
 						xml += '<row id="'+rowCount+'">';
 						var colCount=0;
-						$(this).filter(':visible').find('td').each(function(index,data) {
+						$(this).find('td').each(function(index,data) {
 							if ($(this).css('display') != 'none'){	
 								if(defaults.ignoreColumn.indexOf(index) == -1){
 									xml += "<column-"+colCount+">"+parseString($(this))+"</column-"+colCount+">";
@@ -216,8 +226,14 @@ THE SOFTWARE.*/
 						console.log(xml);
 					}
 					
-					var base64data = "base64," + $.base64.encode(xml);
-					window.open('data:application/xml;filename=exportData;' + base64data);
+					//var base64data = "base64," + $.base64.encode(xml);
+					//window.open('data:application/xml;filename=exportData;' + base64data);
+					    // Blob for saving.
+					var blob = new Blob([xml], {
+					    type: "application/" +defaults.type
+					});
+					    // Tell the browser to save it with fileName and extension e.g. report.txt.
+                        saveAs(blob, defaults.fileName + '.' +defaults.type);
 
 				}else if(defaults.type == 'excel' || defaults.type == 'doc'|| defaults.type == 'powerpoint'  ){
 					//console.log($(this).html());
@@ -225,7 +241,7 @@ THE SOFTWARE.*/
 					// Header
 					$(el).find('thead').find('tr').each(function() {
 						excel += "<tr>";
-						$(this).filter(':visible').find('th').each(function(index,data) {
+						$(this).find('th').each(function(index,data) {
 							if ($(this).css('display') != 'none'){					
 								if(defaults.ignoreColumn.indexOf(index) == -1){
 									excel += "<td>" + parseString($(this))+ "</td>";
@@ -242,7 +258,7 @@ THE SOFTWARE.*/
 					$(el).find('tbody').find('tr').each(function() {
 						excel += "<tr>";
 						var colCount=0;
-						$(this).filter(':visible').find('td').each(function(index,data) {
+						$(this).find('td').each(function(index,data) {
 							if ($(this).css('display') != 'none'){	
 								if(defaults.ignoreColumn.indexOf(index) == -1){
 									excel += "<td>"+parseString($(this))+"</td>";
@@ -283,13 +299,12 @@ THE SOFTWARE.*/
 					excelFile += "</body>";
 					excelFile += "</html>";
 
-					var base64data = "base64," + $.base64.encode(excelFile);
+					//var base64data = "base64," + $.base64.encode(excelFile);
 				    //window.open('data:application/vnd.ms-'+defaults.type+';filename=exportData.doc;' + base64data);
 					
-				    //Jose added this lines
 				    // Blob for saving.
 					var blob = new Blob([excelFile], { type: "application/" + defaults.type });
-				    // Tell the browser to save as report.txt.
+				    // Tell the browser to save it with fileName and extension e.g. report.txt.
 					saveAs(blob, defaults.fileName + '.' + defaults.type);
 					
 				}else if(defaults.type == 'png'){
@@ -305,15 +320,17 @@ THE SOFTWARE.*/
 	
 					var doc = new jsPDF('p','pt', 'a4', true);
 					doc.setFontSize(defaults.pdfFontSize);
-					
+					var startRowPosition = 20;
+
+
 					// Header
 					var startColPosition=defaults.pdfLeftMargin;
 					$(el).find('thead').find('tr').each(function() {
-						$(this).filter(':visible').find('th').each(function(index,data) {
+						$(this).find('th').each(function(index,data) {
 							if ($(this).css('display') != 'none'){					
 								if(defaults.ignoreColumn.indexOf(index) == -1){
 									var colPosition = startColPosition+ (index * 50);									
-									doc.text(colPosition,20, parseString($(this)));
+									doc.text(colPosition, startRowPosition, parseString($(this)));
 								}
 							}
 						});									
@@ -321,7 +338,8 @@ THE SOFTWARE.*/
 				
 				
 					// Row Vs Column
-					var startRowPosition = 20; var page =1;var rowPosition=0;
+                    var page =1;
+                    var rowPosition=0;
 					$(el).find('tbody').find('tr').each(function(index,data) {
 						rowCalc = index+1;
 						
@@ -332,7 +350,7 @@ THE SOFTWARE.*/
 					}
 					rowPosition=(startRowPosition + (rowCalc * 10)) - ((page -1) * 280);
 						
-						$(this).filter(':visible').find('td').each(function(index,data) {
+						$(this).find('td').each(function(index,data) {
 							if ($(this).css('display') != 'none'){	
 								if(defaults.ignoreColumn.indexOf(index) == -1){
 									var colPosition = startColPosition+ (index * 50);									
