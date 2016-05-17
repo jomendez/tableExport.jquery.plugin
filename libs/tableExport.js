@@ -33,8 +33,10 @@ THE SOFTWARE.*/
 						escape:'true',
 						htmlContent:'false',
 						consoleLog: 'false',
-                        fileName: 'report'
-				};
+						fileName: 'report',
+						objToPfd: null,
+                        specifyColumnWidthByColumnNameObj: {}
+                };
                 
 				var options = $.extend(defaults, options);
 				var el = this;
@@ -76,7 +78,7 @@ THE SOFTWARE.*/
 					if(defaults.consoleLog == 'true'){
 						console.log(tdData);
 					}
-					var base64data = "base64," + $.base64.encode(tdData);
+					//var base64data = "base64," + $.base64.encode(tdData);
 				    //window.open('data:application/'+defaults.type+';filename=exportData;' + base64data);
 
 				    // Blob for saving.
@@ -306,67 +308,140 @@ THE SOFTWARE.*/
 					var blob = new Blob([excelFile], { type: "application/" + defaults.type });
 				    // Tell the browser to save it with fileName and extension e.g. report.txt.
 					saveAs(blob, defaults.fileName + '.' + defaults.type);
-					
-				}else if(defaults.type == 'png'){
-					html2canvas($(el), {
-						onrendered: function(canvas) {										
-							var img = canvas.toDataURL("image/png");
-							window.open(img);
-							
-							
-						}
-					});		
+				
 				}else if(defaults.type == 'pdf'){
 	
-					var doc = new jsPDF('p','pt', 'a4', true);
-					doc.setFontSize(defaults.pdfFontSize);
-					var startRowPosition = 20;
 
 
-					// Header
-					var startColPosition=defaults.pdfLeftMargin;
-					$(el).find('thead').find('tr').each(function() {
-						$(this).find('th').each(function(index,data) {
-							if ($(this).css('display') != 'none'){					
-								if(defaults.ignoreColumn.indexOf(index) == -1){
-									var colPosition = startColPosition+ (index * 50);									
-									doc.text(colPosition, startRowPosition, parseString($(this)));
-								}
-							}
-						});									
-					});					
+				    function splitTable(data) {
+				        var newData = [];
+				        if (data.length > 0) {
+
+				            if (Object.keys(data[0]).length <= 4) {
+				                return data;
+				            }
+
+				            for (var i = 0; i < data.length; i++) {
+				                var count = 1;
+				                var obj = {};
+				                var countProp = 0;
+				                for (var property in data[i]) {
+				                    obj[property] = data[i][property];
+				                    if (count % 4 === 0) {
+				                        newData[countProp] = newData[countProp] ? newData[countProp].concat(obj) : [obj];
+				                        obj = {};
+				                        countProp++;
+				                    } else if (Object.keys(data[i]).length === count) {
+				                        newData[countProp] = newData[countProp] ? newData[countProp].concat(obj) : [obj];
+				                        obj = {};
+				                    }
+				                    count++;
+				                }
+				            }
+
+
+				        }
+				        return newData;
+				    }
+
+				    function specifyColumnWidthByColumnName(key, options) {
+				        var defaultVal = 140;//total 560
+				        //options = { 'submitted': 100, 'adid': 30, 'altid': 30, 'allocation': 400 }
+
+				        if (key && options[key.toLowerCase()]) {
+				            return options[key.toLowerCase()];
+				        }
+				        return defaultVal;
+				    }
+
+
+				    var doc = new jsPDF('p', 'pt', 'a4', true);
+				    var data = defaults.objToPfd == null ? doc.tableToJson(defaults.tableName) : defaults.objToPfd;
+
+
+				    var splitedTable = splitTable(data);
+				    var fontSize = defaults.pdfFontSize;
+				    var height = 0;
+				    doc.setFont("times", "normal");
+				    doc.setFontSize(fontSize);
+
+				    for (var i = 0; i < splitedTable.length; i++) {
+
+				        var arr = [];
+				        for (var key in splitedTable[i][0]) {
+				            arr.push(key.toLowerCase());
+				        }
+
+				        height = doc.drawTable(splitedTable[i],
+                        {
+                            xstart: 10,
+                            ystart: 10,
+                            tablestart: 40,
+                            marginright: 100,
+                            xOffset: 10,
+                            yOffset: 10,
+                            columnWidths: [specifyColumnWidthByColumnName(arr[0], defaults.specifyColumnWidthByColumnNameObj), specifyColumnWidthByColumnName(arr[1], defaults.specifyColumnWidthByColumnNameObj), specifyColumnWidthByColumnName(arr[2], defaults.specifyColumnWidthByColumnNameObj), specifyColumnWidthByColumnName(arr[3], defaults.specifyColumnWidthByColumnNameObj)]
+                        });
+				        if (i !== splitedTable.length - 1) {
+				            doc.addPage();
+				        }
+				    }
+				    var fileName = defaults.fileName + '.' + defaults.type;
+				    doc.save(fileName);
+
 				
-				
-					// Row Vs Column
-                    var page =1;
-                    var rowPosition=0;
-					$(el).find('tbody').find('tr').each(function(index,data) {
-						rowCalc = index+1;
-						
-					if (rowCalc % 26 == 0){
-						doc.addPage();
-						page++;
-						startRowPosition=startRowPosition+10;
-					}
-					rowPosition=(startRowPosition + (rowCalc * 10)) - ((page -1) * 280);
-						
-						$(this).find('td').each(function(index,data) {
-							if ($(this).css('display') != 'none'){	
-								if(defaults.ignoreColumn.indexOf(index) == -1){
-									var colPosition = startColPosition+ (index * 50);									
-									doc.text(colPosition,rowPosition, parseString($(this)));
-								}
-							}
-							
-						});															
-						
-					});					
-										
-					// Output as Data URI
-				    //doc.output('datauri');
-					var fileName = defaults.fileName + '.' + defaults.type;
-					doc.output('downloable', fileName);
-					
+
+
+				    //generatefromjson();
+				    //var doc = new jsPDF('p','pt', 'a4', true);
+				    //doc.setFontSize(defaults.pdfFontSize);
+				    //var startRowPosition = 20;
+
+				    //// Header
+				    //var startColPosition=defaults.pdfLeftMargin;
+				    //$(el).find('thead').find('tr').each(function() {
+				    //	$(this).find('th').each(function(index,data) {
+				    //		if ($(this).css('display') != 'none'){					
+				    //			if(defaults.ignoreColumn.indexOf(index) == -1){
+				    //				var colPosition = startColPosition+ (index * 50);									
+				    //				doc.text(colPosition, startRowPosition, parseString($(this)));
+				    //			}
+				    //		}
+				    //	});									
+				    //});					
+
+
+				    //// Row Vs Column
+				    //var page =1;
+				    //var rowPosition=0;
+				    //$(el).find('tbody').find('tr').each(function(index,data) {
+				    //	rowCalc = index+1;
+
+				    //if (rowCalc % 26 == 0){
+				    //	doc.addPage();
+				    //	page++;
+				    //	startRowPosition=startRowPosition+10;
+				    //}
+				    //rowPosition=(startRowPosition + (rowCalc * 10)) - ((page -1) * 280);
+
+				    //	$(this).find('td').each(function(index,data) {
+				    //		if ($(this).css('display') != 'none'){	
+				    //			if(defaults.ignoreColumn.indexOf(index) == -1){
+				    //				var colPosition = startColPosition+ (index * 50);									
+				    //				doc.text(colPosition,rowPosition, parseString($(this)));
+				    //			}
+				    //		}
+
+				    //	});															
+
+				    //});					
+
+
+				    //// Output as Data URI
+				    ////doc.output('datauri');
+				    //var fileName = defaults.fileName + '.' + defaults.type;
+				    //doc.output('downloable', fileName);
+
 				}
 				
 				

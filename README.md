@@ -5,7 +5,6 @@ tableExport.jquery.plugin
 <ul>
 <li> JSON
 <li> XML
-<li> PNG
 <li> CSV
 <li> TXT
 <li> SQL
@@ -17,23 +16,26 @@ tableExport.jquery.plugin
 
 Installation
 ============
-jquery Plugin<BR>
-&lt;script type="text/javascript" src="tableExport.js"><BR>
-&lt;script type="text/javascript" src="jquery.base64.js"><BR>
+
+Core jquery Plugin<BR>
+
+&lt;script type="text/javascript" src="libs/filesaver.js"><BR>
+&lt;script type="text/javascript" src="libs/jspdf.plugin.table.js"><BR>
+&lt;script type="text/javascript" src="libs/tableExport.js"><BR>
 <BR>
-PNG Export
-==========
-&lt;script type="text/javascript" src="html2canvas.js">
+
 
 PDF Export
 ==========
-&lt;script type="text/javascript" src="jspdf/libs/sprintf.js"><BR>
-&lt;script type="text/javascript" src="jspdf/jspdf.js"><BR>
-&lt;script type="text/javascript" src="jspdf/libs/base64.js"><BR>
+&lt;script type="text/javascript" src="libs/jspdf/jspdf.js"><BR>
 
 Usage
 ======
-onClick ="$('#tableID').tableExport({type:'pdf',escape:'false'});"<BR>
+//table to csv
+onClick ="$('#tableID').tableExport({type:'csv',escape:'false'});"<BR>
+
+//object to pdf
+onclick="$().tableExport({ type: 'pdf', pdfFontSize: 9, escape: 'false', objToPfd: exampleData, specifyColumnWidthByColumnNameObj: specifyColumnWidthByColumnName });"<BR>
 
 Options
 =======
@@ -47,3 +49,5 @@ escape:'true'<BR>
 htmlContent:'false'<BR>
 consoleLog:'false' <BR>
 filename:'report' <BR>
+objToPfd: dataObj <BR>
+specifyColumnWidthByColumnNameObj: { 'submitted': 150, 'adid': 150, 'altid': 100, 'allocation': 160 } <BR>
