@@ -318,10 +318,6 @@ THE SOFTWARE.*/
 				        var newData = [];
 				        if (data.length > 0) {
 
-				            if (Object.keys(data[0]).length <= 4) {
-				                return data;
-				            }
-
 				            for (var i = 0; i < data.length; i++) {
 
 
@@ -333,14 +329,6 @@ THE SOFTWARE.*/
 				                    keys = options.columnOrder;
 				                }
 
-				                //for (var e = 0; e < keys.length; e++) {
-				                //    if (data[i][keys[e]] == undefined) {
-				                //        continue;
-				                //    }
-				                //    cellObj = data[i][keys[e]];
-				                //}
-
-				                debugger;
 				                var count = 1;
 				                var obj = {};
 				                var countProp = 0;
