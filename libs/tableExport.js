@@ -1,6 +1,6 @@
 /*The MIT License (MIT)
 
-Copyright (c) 2014 https://github.com/kayalshri/
+Copyright (c) 2016 https://github.com/jomendez/
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,8 @@ THE SOFTWARE.*/
 						consoleLog: 'false',
 						fileName: 'report',
 						objToPfd: null,
-                        specifyColumnWidthByColumnNameObj: {}
+						specifyColumnWidthByColumnNameObj: {},
+						columnOrder: null
                 };
                 
 				var options = $.extend(defaults, options);
@@ -237,7 +238,7 @@ THE SOFTWARE.*/
 					    // Tell the browser to save it with fileName and extension e.g. report.txt.
                         saveAs(blob, defaults.fileName + '.' +defaults.type);
 
-				}else if(defaults.type == 'excel' || defaults.type == 'doc'|| defaults.type == 'powerpoint'  ){
+				}else if(defaults.type == 'xls' || defaults.type == 'doc'|| defaults.type == 'ppt'  ){
 					//console.log($(this).html());
 					var excel="<table>";
 					// Header
@@ -322,11 +323,29 @@ THE SOFTWARE.*/
 				            }
 
 				            for (var i = 0; i < data.length; i++) {
+
+
+				                var keys = [];
+				                if (!defaults.columnOrder) {
+				                    keys = Object.keys(data[i]);
+				                    keys.sort();
+				                } else {
+				                    keys = options.columnOrder;
+				                }
+
+				                //for (var e = 0; e < keys.length; e++) {
+				                //    if (data[i][keys[e]] == undefined) {
+				                //        continue;
+				                //    }
+				                //    cellObj = data[i][keys[e]];
+				                //}
+
+				                debugger;
 				                var count = 1;
 				                var obj = {};
 				                var countProp = 0;
-				                for (var property in data[i]) {
-				                    obj[property] = data[i][property];
+				                for (var p = 0; p < keys.length; p++) {
+				                    obj[keys[p]] = data[i][keys[p]];
 				                    if (count % 4 === 0) {
 				                        newData[countProp] = newData[countProp] ? newData[countProp].concat(obj) : [obj];
 				                        obj = {};
@@ -390,58 +409,6 @@ THE SOFTWARE.*/
 				    doc.save(fileName);
 
 				
-
-
-				    //generatefromjson();
-				    //var doc = new jsPDF('p','pt', 'a4', true);
-				    //doc.setFontSize(defaults.pdfFontSize);
-				    //var startRowPosition = 20;
-
-				    //// Header
-				    //var startColPosition=defaults.pdfLeftMargin;
-				    //$(el).find('thead').find('tr').each(function() {
-				    //	$(this).find('th').each(function(index,data) {
-				    //		if ($(this).css('display') != 'none'){					
-				    //			if(defaults.ignoreColumn.indexOf(index) == -1){
-				    //				var colPosition = startColPosition+ (index * 50);									
-				    //				doc.text(colPosition, startRowPosition, parseString($(this)));
-				    //			}
-				    //		}
-				    //	});									
-				    //});					
-
-
-				    //// Row Vs Column
-				    //var page =1;
-				    //var rowPosition=0;
-				    //$(el).find('tbody').find('tr').each(function(index,data) {
-				    //	rowCalc = index+1;
-
-				    //if (rowCalc % 26 == 0){
-				    //	doc.addPage();
-				    //	page++;
-				    //	startRowPosition=startRowPosition+10;
-				    //}
-				    //rowPosition=(startRowPosition + (rowCalc * 10)) - ((page -1) * 280);
-
-				    //	$(this).find('td').each(function(index,data) {
-				    //		if ($(this).css('display') != 'none'){	
-				    //			if(defaults.ignoreColumn.indexOf(index) == -1){
-				    //				var colPosition = startColPosition+ (index * 50);									
-				    //				doc.text(colPosition,rowPosition, parseString($(this)));
-				    //			}
-				    //		}
-
-				    //	});															
-
-				    //});					
-
-
-				    //// Output as Data URI
-				    ////doc.output('datauri');
-				    //var fileName = defaults.fileName + '.' + defaults.type;
-				    //doc.output('downloable', fileName);
-
 				}
 				
 				
